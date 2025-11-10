@@ -12,11 +12,7 @@ def parse_id_set(env_value: str):
     parts = [p.strip() for p in env_value.split(",") if p.strip()]
     ids = set()
     for p in parts:
-        try:
-            ids.add(int(p))
-        except ValueError:
-            # ignore invalid entries silently
-            continue
+        ids.add(int(p))
     return ids
 
 BAN_CHANNEL_IDS = parse_id_set(os.getenv("CHANNELS", ""))
@@ -47,13 +43,13 @@ async def on_message(message: discord.Message):
     if channel_id not in BAN_CHANNEL_IDS:
         return
 
-    # If the author has any role in the ignore list, do nothing
+
     member: discord.Member = message.author
     for role in getattr(member, "roles", []):
         if role.id in IGNORE_ROLE_IDS:
             return
 
-    # Attempt to ban the member; swallow any exceptions and do no extra logging
+
     await message.guild.ban(message.author, reason=BAN_REASON, delete_message_seconds=604800)
 
 
